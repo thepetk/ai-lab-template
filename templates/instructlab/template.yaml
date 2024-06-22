@@ -137,7 +137,7 @@ spec:
           namespace: ${{ parameters.namespace }}
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
-          appContainer: quay.io/yangcao/chatbot:latest
+          appContainer: quay.io/tpetkos/instructlab:latest
           appPort: 8501
           modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
           modelServicePort: 8001          
@@ -214,7 +214,7 @@ spec:
           webhookSecretKey: webhook.secret
           defaultBranch: main
           initContainer: quay.io/yangcao/granite-7b-lab:latest
-          appContainer: quay.io/yangcao/chatbot:latest
+          appContainer: quay.io/tpetkos/instructlab:latest
           appPort: 8501
           modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
           modelServicePort: 8001
