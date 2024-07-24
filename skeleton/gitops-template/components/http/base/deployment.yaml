@@ -24,11 +24,13 @@ spec:
     spec:
       containers:
       - env:
+        {%- if not(values.ilabSelected) %}
         - name: MODEL_ENDPOINT
           value: http://${{ values.name }}-model-server:${{ values.modelServicePort }}
         {%- if values.vllmSelected %}
         - name: MODEL_NAME
           value: "${{ values.vllmModelName }}"
+        {%- endif %}
         {%- endif %}
         image:  ${{ values.appContainer }}
         name: app-inference

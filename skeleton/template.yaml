@@ -45,8 +45,9 @@ spec:
           enum:
             - llama.cpp
             - vLLM
+            - ilab
           default: llama.cpp
-          ui:help: If you choose vLLM, ensure your cluster has Nvidia GPU supported, and is with enough cpu and memory
+          ui:help: If you choose vLLM, ensure your cluster has Nvidia GPU supported, and is with enough cpu and memory. If you choose ilab you will not be using a model server.
         # SED_MODEL_SERVER_END
     - title: Application Repository Information
       required:
@@ -243,6 +244,8 @@ spec:
           appPort: ${APP_PORT}
           modelServiceContainer: ${MODEL_SERVICE_CONTAINER}
           modelServicePort: ${MODEL_SERVICE_PORT}
+          # for ilab
+          ilabSelected: ${{ parameters.modelServer === 'ilab' }}
           # SED_MODEL_SERVER_START
           # for vllm
           vllmSelected: ${{ parameters.modelServer === 'vLLM' }}
