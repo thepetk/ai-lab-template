@@ -2,9 +2,11 @@ export APP_NAME="ilab"
 export APP_DISPLAY_NAME="Simple Instructlab application"
 export APP_DESC="Simple setup of instructlab"
 export APP_TAGS='["ai", "instructlab", "python", "terminado"]'
-export INIT_CONTAINER="quay.io/thepetk/ilab:latest"
 export APP_PORT=8501
 
 # vllm configurations
 export SUPPORT_VLLM=false
 export SUPPORT_ILAB=true
+
+# for gitlab case, since gitlab does not have pipeline webhook pre-set to trigger the initial build
+export APP_INTERFACE_CONTAINER="quay.io/tpetkos/ilab:latest"
