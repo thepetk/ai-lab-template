@@ -1,4 +1,3 @@
-{%- if not(values.ilabSelected) %}
 apiVersion: v1
 kind: Service
 metadata: 
@@ -14,4 +13,3 @@ spec:
     targetPort: ${{ values.modelServicePort }}
   selector:
     app.kubernetes.io/instance: ${{ values.name }}-model-server
-{%- endif %}
