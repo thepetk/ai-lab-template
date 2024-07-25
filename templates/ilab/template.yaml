@@ -229,6 +229,8 @@ spec:
           appPort: 8501
           modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
           modelServicePort: 8001
+          # for ilab
+          ilabSelected: ${{ parameters.modelServer === 'ilab' }}
           # for RHOAI
           rhoaiSelected: ${{ parameters.rhoaiSelected }}
     - action: fs:rename
