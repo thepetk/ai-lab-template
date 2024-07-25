@@ -8,7 +8,7 @@ commonLabels:
   app.kubernetes.io/part-of: ${{ values.name }}
 resources: 
 - initialize-namespace.yaml
-{%- if or .Values.vllmSelected Values.ilabSelected %}
+{%- if or .Values.vllmSelected .Values.ilabSelected %}
 - pvc.yaml
 {%- endif %}
 {%- if not(values.ilabSelected) %}
