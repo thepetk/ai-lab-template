@@ -245,7 +245,7 @@ spec:
           modelServiceContainer: ${MODEL_SERVICE_CONTAINER}
           modelServicePort: ${MODEL_SERVICE_PORT}
           # for ilab
-          ilabSelected: ${{ parameters.modelServer === 'ilab' }}
+          ilabSelected: ${{SUPPORT_ILAB}}
           # SED_MODEL_SERVER_START
           # for vllm
           vllmSelected: ${{ parameters.modelServer === 'vLLM' }}

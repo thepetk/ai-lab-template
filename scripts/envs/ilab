@@ -7,3 +7,4 @@ export APP_PORT=8501
 
 # vllm configurations
 export SUPPORT_VLLM=false
+export SUPPORT_ILAB=true
