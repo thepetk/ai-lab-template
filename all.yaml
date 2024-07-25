@@ -8,3 +8,4 @@ spec:
     - ./templates/codegen/template.yaml
     - ./templates/chatbot/template.yaml
     - ./templates/audio-to-text/template.yaml
+    - ./templates/ilab/template.yaml
