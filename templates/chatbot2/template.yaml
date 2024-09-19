@@ -309,7 +309,7 @@ spec:
           existingModelServer: ${{ parameters.modelServer === 'Existing model server' }}
           modelEndpoint: ${{ parameters.modelEndpoint }}
           modelEndpointSecretName: ${{ parameters.modelEndpointSecretName }}
-          modelEndpointSecretKey: ${{ parameters.modelEndpointSecretName }}
+          modelEndpointSecretKey: ${{ parameters.modelEndpointSecretKey }}
           includeModelEndpointSecret: ${{ parameters.modelEndpointSecretName }}
           # for RHOAI
           rhoaiSelected: ${{ parameters.rhoaiSelected }}
