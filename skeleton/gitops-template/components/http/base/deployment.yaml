@@ -29,9 +29,9 @@ spec:
         env:
         - name: MODEL_ENDPOINT_API_KEY
           valueFrom:
-          secretKeyRef:
-            name: ${{ values.ModelEndpointSecretName }}
-            key: ${{ values.ModelEndpointSecretKey }}
+            secretKeyRef:
+              name: ${{ values.ModelEndpointSecretName }}
+              key: ${{ values.ModelEndpointSecretKey }}
         {%- endif %}
         envFrom:
         - configMapRef:
