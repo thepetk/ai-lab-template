@@ -66,6 +66,12 @@ spec:
                   title: Needs API key?
                   type: boolean
                   default: false
+                # SED_LLM_SERVER_START
+                modelName:
+                  title: Model Name
+                  type: string
+                  ui:help: "The name of the model deployed on the model server you would like to use."
+                # SED_LLM_SERVER_END
               dependencies:
                 includeModelEndpointSecret:
                   allOf:
@@ -86,13 +92,6 @@ spec:
                         required:
                           - modelEndpointSecretName
                           - modelEndpointSecretKey
-                # SED_LLM_SERVER_START
-                # SED_LLM_SERVER_START
-                modelName:
-                  title: Model Name
-                  type: string
-                  ui:help: "The name of the model deployed on the model server you would like to use."
-                # SED_LLM_SERVER_END
             # SED_LLM_SERVER_START
             - properties:
                 modelServer:
