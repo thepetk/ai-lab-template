@@ -12,6 +12,19 @@ import os
 model_service = os.getenv("MODEL_ENDPOINT",
                           "http://localhost:8001")
 model_service = f"{model_service}/v1"
+model_service_key = os.getenv("MODEL_ENDPOINT_API_KEY")
+
+def get_model_service_headers():
+    if model_service_key is not None:
+        return {"Authorization": f"Bearer {model_service_key}"}
+    return None
+
+model_service_headers = get_model_service_headers()
+
+def get_request(uri, headers=model_service_headers):
+    if headers is None:
+        requests.get(uri)
+    return requests.get(uri, headers=headers)
 
 @st.cache_resource(show_spinner=False)
 def checking_model_service():
@@ -20,8 +33,8 @@ def checking_model_service():
     ready = False
     while not ready:
         try:
-            request_cpp = requests.get(f'{model_service}/models')
-            request_ollama = requests.get(f'{model_service[:-2]}api/tags')
+            request_cpp = get_request(f'{model_service}/models')
+            request_ollama = get_request(f'{model_service[:-2]}api/tags')
             if request_cpp.status_code == 200:
                 server = "Llamacpp_Python"
                 ready = True
@@ -37,7 +50,7 @@ def checking_model_service():
 
 def get_models():
     try:
-        response = requests.get(f"{model_service[:-2]}api/tags")
+        response = get_request(f"{model_service[:-2]}api/tags")
         return [i["name"].split(":")[0] for i in  
             json.loads(response.content)["models"]]
     except:

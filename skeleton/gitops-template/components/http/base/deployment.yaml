@@ -25,6 +25,14 @@ spec:
       containers:
       - image:  ${{ values.appContainer }}
         name: app-inference
+        {%- if values.includeModelEndpointSecret %}
+        env:
+        - name: MODEL_ENDPOINT_API_KEY
+          valueFrom:
+          secretKeyRef:
+            name: ${{ values.ModelEndpointSecretName }}
+            key: ${{ values.ModelEndpointSecretKey }}
+        {%- endif %}
         envFrom:
         - configMapRef:
             name: ${{ values.name }}-model-config
