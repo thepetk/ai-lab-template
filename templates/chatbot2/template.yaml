@@ -68,7 +68,7 @@ spec:
                   default: false
               dependencies:
                 includeModelEndpointSecret:
-                  allof:
+                  allOf:
                     - if:
                         properties:
                           includeModelEndpointSecret:
