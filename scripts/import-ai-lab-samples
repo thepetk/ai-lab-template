@@ -5,7 +5,7 @@ ROOT_DIR=$(realpath $SCRIPTDIR/..)
 SKELETON_DIR=$ROOT_DIR/skeleton
 TEMPLATE_DIR=$ROOT_DIR/templates
 
-REPO="${SAMPLE_REPO:-https://github.com/redhat-ai-dev/ai-lab-samples}"
+REPO="${SAMPLE_REPO:-https://github.com/thepetk/ai-lab-samples}"
 BRANCH="${SAMPLE_BRANCH:-main}"
 DIRNAME=$(basename $REPO)
 
