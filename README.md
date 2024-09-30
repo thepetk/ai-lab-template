@@ -25,6 +25,14 @@ This will add the samples into a set of Backstage templates.
 
 ![Screenshot](catalog.png)
 
+### Bring Your Own Model Server Feature
+
+Some templates allow the user to bring their own model server, by providing the model server endpoint. This feature also supports model server endpoints requiring bearer authentication.
+
+In order to register an endpoint that requires bearer authentication:
+* A kubernetes Secret should already exist on your namespace.
+* Click on the `Needs API key?` field, and,
+* Provide the name of the Secret and the key that stores the value of your API key.
 
 ## On-prem Host Support
 
