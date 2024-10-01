@@ -33,7 +33,7 @@ spec:
                       - name: kind
                         value: task
                       - name: name
-                        value: rhtap-dev-namespace-setup
+                        value: ai-rhdh-dev-namespace-setup
                       - name: namespace
                         value: ${{ values.rhtapNamespace }}
                     resolver: cluster 
