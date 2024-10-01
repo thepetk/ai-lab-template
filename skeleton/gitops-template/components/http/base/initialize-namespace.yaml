@@ -21,7 +21,7 @@ spec:
           apiVersion: tekton.dev/v1
           kind: PipelineRun
           metadata:
-            generateName: rhtap-dev-namespace-setup-
+            generateName: ai-rhdh-dev-namespace-setup-
             namespace: $NS 
           spec:
             pipelineSpec:
