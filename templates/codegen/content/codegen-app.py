@@ -47,7 +47,7 @@ model_name = os.getenv("MODEL_NAME", "")
 
 llm = ChatOpenAI(base_url=model_service,
                  model=model_name,
-                 api_key="EMPTY",
+                 api_key=model_service_bearer,
                  streaming=True)
 
 # Define the Langchain chain
