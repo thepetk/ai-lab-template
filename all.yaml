@@ -9,4 +9,4 @@ spec:
     - ./templates/chatbot/template.yaml
     - ./templates/audio-to-text/template.yaml
     - ./templates/object-detection/template.yaml
-    - ./templates/rag3/template.yaml
+    - ./templates/rag4/template.yaml
