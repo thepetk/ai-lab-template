@@ -9,7 +9,7 @@ st.markdown("Upload an audio file you wish to have translated")
 endpoint = os.getenv("MODEL_ENDPOINT", default="http://0.0.0.0:8001")
 endpoint = f"{endpoint}/inference"
 endpoint_bearer = os.getenv("MODEL_ENDPOINT_BEARER")
-request_kwargs = {}
+request_kwargs = {"verify": False}
 if endpoint_bearer is not None:
     request_kwargs["headers"] = {"Authorization": f"Bearer {endpoint_bearer}"}
 audio = st.file_uploader("", type=["wav","mp3","mp4","flac"], accept_multiple_files=False)
