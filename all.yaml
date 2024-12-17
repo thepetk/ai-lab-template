@@ -5,7 +5,7 @@ metadata:
   description: AI LAB Samples
 spec:
   targets:
-    - ./templates/codegen/template.yaml
+    - ./templates/codegen2/template.yaml
     - ./templates/chatbot/template.yaml
     - ./templates/audio-to-text/template.yaml
     - ./templates/object-detection/template.yaml

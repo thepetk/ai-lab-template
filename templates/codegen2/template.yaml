@@ -2,8 +2,8 @@ apiVersion: scaffolder.backstage.io/v1beta3
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
-  name: codegen
-  title: Code Generation Application
+  name: codegen2
+  title: Code Generation Application 2
   description: Build your own Large Language Model (LLM)-enabled code generation application to generate code source from a natural language. Pick from the model servers available or bring your own.
   tags: ["ai", "llamacpp", "vllm", "python"]
   annotations:
@@ -42,14 +42,14 @@ spec:
           title: Model Server
           description: |
             llama.cpp: A Python binding of LLM inference in C/C++ with minimal setup. | [Learn more](https://github.com/containers/ai-lab-recipes/tree/main/model_servers/llamacpp_python)
-            
+
             vLLM: A high throughput, memory efficient inference and serving engine with GPU support for LLMs in OpenShift. If you choose vLLM, ensure that your cluster has Nvidia GPU supported (with compute capability 7.0 or higher). Also, it should have enough CPU & memory resources for the model you would like to work with. | [Learn more](https://github.com/rh-aiservices-bu/llm-on-openshift/tree/main/llm-servers/vllm/gpu)
           default: llama.cpp
           type: string
           enum:
             - vLLM
             - llama.cpp
-          # SED_LLM_SERVER_END
+            # SED_LLM_SERVER_END
             - Existing model server
       dependencies:
         modelServer:
@@ -61,7 +61,7 @@ spec:
                 # SED_LLM_SERVER_END
               properties:
                 modelServer:
-                    const: Existing model server
+                  const: Existing model server
                 modelEndpoint:
                   title: Model Server Endpoint
                   type: string
@@ -152,7 +152,7 @@ spec:
                 - githubServer
               properties:
                 hostType:
-                    const: GitHub
+                  const: GitHub
                 githubServer:
                   title: Repository Server
                   type: string
@@ -162,7 +162,7 @@ spec:
                 - gitlabServer
               properties:
                 hostType:
-                    const: GitLab
+                  const: GitLab
                 gitlabServer:
                   title: Repository Server
                   type: string
@@ -225,7 +225,7 @@ spec:
           appPort: 8501
           appRunCommand: "streamlit run codegen-app.py"
           modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
-          modelServicePort: 8001          
+          modelServicePort: 8001
     # Renders all the template variables into the files and directory names and content, and places the result in the workspace.
     - id: fetch-skeleton
       name: Fetch Skeleton
@@ -236,14 +236,14 @@ spec:
         values:
           name: ${{ parameters.name }}
           namespace: ${{ parameters.namespace }}
-          description: Secure Supply Chain Example for Code Generation Application 
+          description: Secure Supply Chain Example for Code Generation Application
           dockerfile: Containerfile
           buildContext: .
           gitopsSecretName: ${{ 'gitops-auth-secret' if parameters.hostType === 'GitHub' else 'gitlab-auth-secret' }}
-          image: '${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          image: "${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           tags: '["ai", "llamacpp", "vllm", "python"]'
-          owner: ${{ parameters.owner }} 
-          repoSlug: '${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          owner: ${{ parameters.owner }}
+          repoSlug: "${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           defaultBranch: ${{ parameters.branch }}
     - id: fetch-github-action
       name: Fetch GitHub Action
@@ -259,7 +259,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: source
-        allowedHosts: [ '${{ parameters.githubServer}}' ]
+        allowedHosts: ["${{ parameters.githubServer}}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -276,7 +276,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: source
-        allowedHosts: [ '${{ parameters.gitlabServer }}' ]
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -298,7 +298,7 @@ spec:
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
-          argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          argoComponentOverlays: "./components/${{ parameters.name }}/overlays"
           owner: ${{ parameters.owner }}
           argoNS: ai-rhdh
           argoProject: default
@@ -343,9 +343,9 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.githubServer }}']
+        allowedHosts: ["${{ parameters.githubServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
-        repoUrl:  ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
+        repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
         protectDefaultBranch: false
         repoVisibility: "public"
@@ -356,15 +356,15 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
-        repoUrl:  ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
+        repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
         protectDefaultBranch: false
         repoVisibility: "public"
     - id: wait-for-github-repository
       name: Waiting for Repository Availability
-      action: 'debug:wait'
+      action: "debug:wait"
       input:
         seconds: 3
     - id: register
@@ -372,13 +372,13 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl if steps['publish-github'].output else steps['publish-gitlab'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     - id: register-gitops
       name: Register Gitops
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github-gitops'].output.repoContentsUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     - id: create-argocd-resources
       name: Create ArgoCD Resources
       action: argocd:create-resources
@@ -388,7 +388,7 @@ spec:
         argoInstance: default
         namespace: ai-rhdh
         repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
-        path: './app-of-apps'
+        path: "./app-of-apps"
     # PR with empty commit
     - id: trigger-build-pr
       name: PR to Trigger Pipeline Build
@@ -411,10 +411,8 @@ spec:
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         branchOrTagName: ${{ parameters.branch }}
         workflowId: automerge.yml
-        workflowInputs: {
-          pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}"
-        }
-
+        workflowInputs:
+          { pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}" }
 
   # Outputs are displayed to the user after a successful execution of the template.
   output:
