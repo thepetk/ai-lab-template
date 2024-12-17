@@ -1,7 +1,9 @@
+{{- if .Values.dbRequired }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${{ values.name }}-database-config
+  name: {{ .Values.name }}-database-config
 data:
-  VECTORDB_HOST: "${{ values.name }}-database"
-  VECTORDB_PORT: "${{ values.dbPort }}"
+  VECTORDB_HOST: "{{ .Values.name }}-database"
+  VECTORDB_PORT: "{{ .Values.dbPort }}"
+{{- end }}

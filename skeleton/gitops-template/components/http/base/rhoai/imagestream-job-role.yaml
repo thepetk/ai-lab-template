@@ -1,7 +1,8 @@
+{{- if .Values.rhoaiSelected }}
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: ${{ values.name }}-imagestream-job-role
+  name: {{ .Values.name }}-imagestream-job-role
   namespace: redhat-ods-applications
 rules:
   - verbs:
@@ -12,3 +13,4 @@ rules:
       - "image.openshift.io"
     resources:
       - imagestreams
+{{- end }}

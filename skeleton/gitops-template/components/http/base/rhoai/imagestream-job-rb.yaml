@@ -1,13 +1,15 @@
+{{- if .Values.rhoaiSelected }}
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: ${{ values.name }}-imagestream-job-rolebinding
+  name: {{ .Values.name }}-imagestream-job-rolebinding
   namespace: redhat-ods-applications
 subjects:
   - kind: ServiceAccount
-    name: ${{ values.name }}-dsp-job
-    namespace: ${{ values.namespace }}
+    name: {{ .Values.name }}-dsp-job
+    namespace: {{ .Values.namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: ${{ values.name }}-imagestream-job-role
+  name: {{ .Values.name }}-imagestream-job-role
+{{- end }}

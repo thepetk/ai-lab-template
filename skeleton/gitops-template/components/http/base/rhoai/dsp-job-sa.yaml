@@ -1,4 +1,6 @@
+{{- if .Values.rhoaiSelected }}
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  name: ${{ values.name }}-dsp-job
+  name: {{ .Values.name }}-dsp-job
+{{- end }}

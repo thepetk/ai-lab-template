@@ -1,15 +1,16 @@
+{{- if .Values.dbRequired }}
 apiVersion: v1
 kind: Service
 metadata: 
   labels: 
-    app.kubernetes.io/instance: ${{ values.name }}-database
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/name: ${{ values.name }}-database 
-  name: ${{ values.name }}-database
+    app.kubernetes.io/instance: {{ .Values.name }}-database
+    app.kubernetes.io/name: {{ .Values.name }}-database 
+  name: {{ .Values.name }}-database
 spec:
   ports:
-  - port: ${{ values.dbPort }}
+  - port: {{ .Values.dbPort }}
     protocol: TCP
-    targetPort: ${{ values.dbPort }}
+    targetPort: {{ .Values.dbPort }}
   selector:
-    app.kubernetes.io/instance: ${{ values.name }}-database 
+    app.kubernetes.io/instance: {{ .Values.name }}-database 
+{{- end }}

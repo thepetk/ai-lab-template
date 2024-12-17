@@ -1,15 +1,16 @@
+{{- if not .Values.existingModelServer }}
 apiVersion: v1
 kind: Service
 metadata: 
   labels: 
-    app.kubernetes.io/instance: ${{ values.name }}-model-server
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/name: ${{ values.name }}-model-server
-  name: ${{ values.name }}-model-server
+    app.kubernetes.io/instance: {{ .Values.name }}-model-server
+    app.kubernetes.io/name: {{ .Values.name }}-model-server
+  name: {{ .Values.name }}-model-server
 spec:
   ports:
-  - port: ${{ values.modelServicePort }}
+  - port: {{ .Values.modelServicePort }}
     protocol: TCP
-    targetPort: ${{ values.modelServicePort }}
+    targetPort: {{ .Values.modelServicePort }}
   selector:
-    app.kubernetes.io/instance: ${{ values.name }}-model-server
+    app.kubernetes.io/instance: {{ .Values.name }}-model-server
+{{- end }}
