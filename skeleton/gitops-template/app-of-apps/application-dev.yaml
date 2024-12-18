@@ -8,6 +8,7 @@ spec:
   project: {{ .Values..argoProject }}
   source:
     path: {{ .Values..argoComponentOverlays }}/development
+    directory: recursive
     repoURL: {{ .Values..repoURL }}.git
     targetRevision: main
     helm:
