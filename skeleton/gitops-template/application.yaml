@@ -1,25 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values.name }}
-  namespace: {{ .Values.argoNS }}
+  name: ${{ values.name }}
+  namespace: ${{ values.argoNS }}
   finalizers: ["resources-finalizer.argocd.argoproj.io"] 
 spec:
-  project: {{ .Values.argoProject }}
+  project: ${{ values.argoProject }}
   source:
     path: ./app-of-apps
     directory: recursive
-    repoURL: {{ .Values.repoURL }}.git
+    repoURL: ${{ values.repoURL }}.git
     targetRevision: main
     helm:
-      releaseName: {{ .Values.name }}
+      releaseName: ${{ values.name }}
   destination:
-    namespace: {{ .Values.namespace }}
+    namespace: ${{ values.namespace }}
     server: https://kubernetes.default.svc
   syncPolicy:
     managedNamespaceMetadata:
       labels: 
-        argocd.argoproj.io/managed-by: {{ .Values.argoNS }}
+        argocd.argoproj.io/managed-by: ${{ values.argoNS }}
     automated: 
       prune: true
       selfHeal: true
