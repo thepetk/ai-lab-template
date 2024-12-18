@@ -1,15 +1,15 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ .Values..name }}-app
-  namespace: {{ .Values..argoNS }}
+  name: {{ .Values.name }}-app
+  namespace: {{ .Values.argoNS }}
   finalizers: ["resources-finalizer.argocd.argoproj.io"] 
 spec:
-  project: {{ .Values..argoProject }}
+  project: {{ .Values.argoProject }}
   source:
-    path: {{ .Values..argoComponentOverlays }}/development
+    path: {{ .Values.argoComponentOverlays }}/development
     directory: recursive
-    repoURL: {{ .Values..repoURL }}.git
+    repoURL: {{ .Values.repoURL }}.git
     targetRevision: main
     helm:
       releaseName: {{ .Values.name }}
