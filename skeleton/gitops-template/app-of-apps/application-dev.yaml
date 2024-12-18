@@ -10,6 +10,8 @@ spec:
     path: ${{ values.argoComponentOverlays }}/development
     repoURL: ${{ values.repoURL }}.git
     targetRevision: main
+    helm:
+      releaseName: ${{ values.name }}
   destination:
     namespace: ${{ values.namespace }}
     server: https://kubernetes.default.svc
