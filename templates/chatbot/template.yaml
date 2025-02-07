@@ -38,6 +38,11 @@ spec:
             catalogFilter:
               kind: [Group, User]
               readonly: false
+        deployOnRemoteCluster:
+          title: Deploy ArgoCD Application on remote cluster?
+          type: boolean
+          default: false
+          ui:help: If set to true it deploys an application to a remote cluster.
         modelServer:
           # SED_LLM_SERVER_START
           title: Model Server
@@ -59,6 +64,25 @@ spec:
             - Existing model server
             # SED_EXISTING_SERVER_END
       dependencies:
+        deployOnRemoteCluster:
+          allOf:
+            - if:
+                properties:
+                  deployOnRemoteCluster:
+                    const: true
+              then:
+                properties:
+                  remoteClusterAPIUri:
+                    title: Remote cluster API URL
+                    ui:help: Kube API URL of remote cluster.
+                    type: string
+                  remoteClusterNamespace:
+                    title: Remote cluster deployment namespace
+                    ui:help: The namespace of the remote cluster that the argoCD application will be deployed.
+                    type: string
+                required:
+                  - remoteClusterAPIUri
+                  - remoteClusterNamespace
         modelServer:
           oneOf:
             # SED_EXISTING_SERVER_START
@@ -264,10 +288,10 @@ spec:
           dockerfile: Containerfile
           buildContext: .
           gitopsSecretName: ${{ 'gitops-auth-secret' if parameters.hostType === 'GitHub' else 'gitlab-auth-secret' }}
-          image: '${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          image: "${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           tags: '["ai", "llamacpp", "vllm", "python"]'
           owner: ${{ parameters.owner }}
-          repoSlug: '${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          repoSlug: "${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           defaultBranch: ${{ parameters.branch }}
     - id: fetch-github-action
       name: Fetch GitHub Action
@@ -283,7 +307,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.githubServer}}']
+        allowedHosts: ["${{ parameters.githubServer}}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -300,7 +324,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -320,10 +344,13 @@ spec:
           description: This is GitOps manifest for ${{ parameters.name }}
           namespace: ${{ parameters.namespace }}
           rhdhNamespace: ai-rhdh
+          deployOnRemoteCluster: ${{ parameters.deployOnRemoteCluster }}
+          remoteClusterAPIUri: ${{ parameters.remoteClusterAPIUri }}
+          remoteClusterNamespace: ${{ parameters.remoteClusterNamespace }}
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
-          argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          argoComponentOverlays: "./components/${{ parameters.name }}/overlays"
           owner: ${{ parameters.owner }}
           argoNS: ai-rhdh
           argoProject: default
@@ -373,7 +400,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.githubServer }}']
+        allowedHosts: ["${{ parameters.githubServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -386,7 +413,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -394,7 +421,7 @@ spec:
         repoVisibility: "public"
     - id: wait-for-github-repository
       name: Waiting for Repository Availability
-      action: 'debug:wait'
+      action: "debug:wait"
       input:
         seconds: 3
     # SED_APP_SUPPORT_START
@@ -403,14 +430,14 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl if steps['publish-github'].output else steps['publish-gitlab'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     # SED_APP_SUPPORT_END
     - id: register-gitops
       name: Register Gitops
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github-gitops'].output.repoContentsUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     - id: create-argocd-resources
       name: Create ArgoCD Resources
       action: argocd:create-resources
@@ -420,7 +447,7 @@ spec:
         argoInstance: default
         namespace: ai-rhdh
         repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
-        path: './app-of-apps'
+        path: "./app-of-apps"
     # SED_APP_SUPPORT_START
     # PR with empty commit
     - id: trigger-build-pr
@@ -444,7 +471,8 @@ spec:
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         branchOrTagName: ${{ parameters.branch }}
         workflowId: automerge.yml
-        workflowInputs: {pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}"}
+        workflowInputs:
+          { pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}" }
   # SED_APP_SUPPORT_END
 
   # Outputs are displayed to the user after a successful execution of the template.
