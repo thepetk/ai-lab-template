@@ -2,8 +2,8 @@ apiVersion: scaffolder.backstage.io/v1beta3
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
-  name: codegen
-  title: Code Generation Application
+  name: codegen2
+  title: Code Generation Application2
   description: Build your own Large Language Model (LLM)-enabled code generation application to generate code source from a natural language. Pick from the model servers available or bring your own.
   tags: ["ai", "llamacpp", "vllm", "python"]
   annotations:
@@ -38,6 +38,11 @@ spec:
             catalogFilter:
               kind: [Group, User]
               readonly: false
+        deployOnRemoteCluster:
+          title: Deploy ArgoCD Application on remote cluster?
+          type: boolean
+          default: false
+          ui:help: If set to true it deploys an application to a remote cluster.
         modelServer:
           # SED_LLM_SERVER_START
           title: Model Server
@@ -59,6 +64,25 @@ spec:
             - Existing model server
             # SED_EXISTING_SERVER_END
       dependencies:
+        deployOnRemoteCluster:
+          allOf:
+            - if:
+                properties:
+                  deployOnRemoteCluster:
+                    const: true
+              then:
+                properties:
+                  remoteClusterAPIUri:
+                    title: Remote cluster API URL
+                    ui:help: Kube API URL of remote cluster.
+                    type: string
+                  remoteClusterNamespace:
+                    title: Remote cluster deployment namespace
+                    ui:help: The namespace of the remote cluster that the argoCD application will be deployed.
+                    type: string
+                required:
+                  - remoteClusterAPIUri
+                  - remoteClusterNamespace
         modelServer:
           oneOf:
             # SED_EXISTING_SERVER_START
@@ -320,6 +344,9 @@ spec:
           description: This is GitOps manifest for ${{ parameters.name }}
           namespace: ${{ parameters.namespace }}
           rhdhNamespace: ai-rhdh
+          deployOnRemoteCluster: ${{ parameters.deployOnRemoteCluster }}
+          remoteClusterAPIUri: ${{ parameters.remoteClusterAPIUri }}
+          remoteClusterNamespace: ${{ parameters.remoteClusterNamespace }}
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
