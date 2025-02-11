@@ -295,6 +295,7 @@ spec:
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
           argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          argoComponentHttpBase: './components/${{ parameters.name }}/base'
           owner: ${{ parameters.owner }}
           argoNS: ai-rhdh
           argoProject: default
