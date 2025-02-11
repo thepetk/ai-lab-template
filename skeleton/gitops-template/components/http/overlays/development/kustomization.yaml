@@ -5,8 +5,4 @@ patchesStrategicMerge:
   - deployment-patch.yaml
 {%- endif %}
 resources:
-  - ../../base
-  - gitops-repository.yaml
-  {%- if values.supportApp %}
-  - source-repository.yaml
-  {%- endif %}
+  - ../../base 
