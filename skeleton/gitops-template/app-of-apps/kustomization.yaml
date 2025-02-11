@@ -8,3 +8,5 @@ commonLabels:
   app.kubernetes.io/part-of: ${{ values.name }}
 resources:
 - application-dev.yaml
+- gitops-repository.yaml
+- source-repository.yaml
