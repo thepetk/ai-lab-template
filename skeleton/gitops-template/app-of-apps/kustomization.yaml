@@ -9,7 +9,7 @@ commonLabels:
 resources:
 - application-dev.yaml
 {%- if values.deployOnRemoteCluster %}
-- gitops-repository.yaml
-- source-repository.yaml
-- initialize-namespace.yaml
+- ../components/http/overlays/gitops-repository.yaml
+- ../components/http/overlays/source-repository.yaml
+- ../components/http.base/initialize-namespace.yaml
 {%- endif %}
