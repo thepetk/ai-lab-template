@@ -8,8 +8,5 @@ commonLabels:
   app.kubernetes.io/part-of: ${{ values.name }}
 resources:
 - application-dev.yaml
-{%- if values.deployOnRemoteCluster %}
-- ../components/${{ values.name }}/overlays/development/gitops-repository.yaml
-- ../components/${{ values.name }}/overlays/development/source-repository.yaml
-- ../components/${{ values.name }}/base/initialize-namespace.yaml
-{%- endif %}
+- gitops-repository.yaml
+- source-repository.yaml
