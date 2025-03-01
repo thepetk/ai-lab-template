@@ -7,7 +7,7 @@ metadata:
 spec:
   project: ${{ values.argoProject }}
   source:
-    path: ./
+    path: ./app-of-apps
     repoURL: ${{ values.repoURL }}.git
     targetRevision: main
   destination:
