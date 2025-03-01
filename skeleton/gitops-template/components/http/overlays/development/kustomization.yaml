@@ -3,9 +3,4 @@ kind: Kustomization
 patchesStrategicMerge:
   - deployment-patch.yaml
 resources:
-  {%- if not values.deployOnRemoteCluster %}
-  - ../../../../app-of-apps/initialize-namespace.yaml
-  - ../../../../app-of-apps/gitops-repository.yaml
-  - ../../../../app-of-apps/source-repository.yaml
-  {%- endif %}
   - ../../base
