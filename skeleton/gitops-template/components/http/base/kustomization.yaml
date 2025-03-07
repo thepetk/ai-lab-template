@@ -8,7 +8,7 @@ commonLabels:
   app.kubernetes.io/part-of: ${{ values.name }}
 resources:
   {%- if not values.deployOnRemoteCluster %}
-  - initialize-namespace.yaml
+  - initialize-namespace/
   {%- endif %}  
   {%- if values.vllmSelected %}
   - pvc.yaml
