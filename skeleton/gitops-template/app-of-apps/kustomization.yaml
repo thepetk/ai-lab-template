@@ -10,4 +10,4 @@ resources:
 - application-dev.yaml
 {%- if values.deployOnRemoteCluster %}
 - application-tekton.yaml
-  {%- endif %}
+{%- endif %}
