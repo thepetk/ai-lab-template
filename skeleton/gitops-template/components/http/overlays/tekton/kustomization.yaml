@@ -3,4 +3,3 @@ kind: Kustomization
 resources:
   - ../../base/initialize-namespace/
   - ../development/tekton-repositories/
-  - ../development/tekton-repositories/
