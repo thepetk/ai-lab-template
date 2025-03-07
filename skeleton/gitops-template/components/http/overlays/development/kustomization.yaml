@@ -4,3 +4,7 @@ patchesStrategicMerge:
   - deployment-patch.yaml
 resources:
   - ../../base
+  {%- if not values.deployOnRemoteCluster %}
+  - gitops-repository.yaml
+  - source-repository.yaml
+  {%- endif %}
