@@ -59,7 +59,7 @@ spec:
             # SED_LLM_LLAMA_SERVER_START
             - llama.cpp
             # SED_LLM_LLAMA_SERVER_END
-          # SED_LLM_SERVER_END
+            # SED_LLM_SERVER_END
             # SED_EXISTING_SERVER_START
             - Existing model server
             # SED_EXISTING_SERVER_END
@@ -76,13 +76,8 @@ spec:
                     title: Remote cluster API URL
                     ui:help: Kube API URL of remote cluster.
                     type: string
-                  remoteClusterNamespace:
-                    title: Remote cluster deployment namespace
-                    ui:help: The namespace of the remote cluster that the argoCD application will be deployed.
-                    type: string
                 required:
                   - remoteClusterAPIUri
-                  - remoteClusterNamespace
         modelServer:
           oneOf:
             # SED_EXISTING_SERVER_START
@@ -346,7 +341,6 @@ spec:
           rhdhNamespace: ai-rhdh
           deployOnRemoteCluster: ${{ parameters.deployOnRemoteCluster }}
           remoteClusterAPIUri: ${{ parameters.remoteClusterAPIUri }}
-          remoteClusterNamespace: ${{ parameters.remoteClusterNamespace }}
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
