@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: ${{ values.name }}
   labels:
-    - rolling-demo
+    rolling-demo: application
   namespace: ${{ values.argoNS }}
   finalizers: ["resources-finalizer.argocd.argoproj.io"]
 spec:
