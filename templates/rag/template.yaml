@@ -34,7 +34,7 @@ spec:
         - includeArgoLabel
         - argoAppLabel
         - modelServer
-        - '*'
+        - "*"
       properties:
         name:
           title: Name
@@ -61,7 +61,7 @@ spec:
           title: ArgoCD Namespace
           type: string
           description: The target namespace of the ArgoCD deployment
-          default: ai-rhdh
+          default: openshift-gitops
           maxLength: 63
         argoInstance:
           title: ArgoCD Instance
@@ -97,7 +97,7 @@ spec:
             # SED_LLM_LLAMA_SERVER_START
             - llama.cpp
             # SED_LLM_LLAMA_SERVER_END
-          # SED_LLM_SERVER_END
+            # SED_LLM_SERVER_END
             # SED_EXISTING_START
             - Select an existing model server
             # SED_EXISTING_SERVER_START
@@ -159,7 +159,7 @@ spec:
                 modelServer:
                   const: Bring you own model server
                 modelServerDescription:
-                  type: 'null'
+                  type: "null"
                   # SED_LLM_SERVER_START
                   description: Fill in the model server endpoint and model name you wish to use with your application.
                   # SED_LLM_SERVER_END
@@ -205,7 +205,7 @@ spec:
                 modelServer:
                   const: vLLM
                 modelServerDescription:
-                  type: 'null'
+                  type: "null"
                   description: A high throughput, memory efficient inference and serving engine with GPU support for LLMs in OpenShift. If you choose vLLM, ensure that your cluster has Nvidia GPU supported (with compute capability 7.0 or higher). Also, it should have enough CPU & memory resources for the model you would like to work with. | [Learn more](https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/vllm/0.8.4)
                 modelNameDeployed:
                   title: Model Name
@@ -219,7 +219,7 @@ spec:
                 modelServer:
                   const: llama.cpp
                 modelServerDescription:
-                  type: 'null'
+                  type: "null"
                   description: A Python binding of LLM inference in C/C++ with minimal setup. | [Learn more](https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/llamacpp_python/0.3.8)
                 modelNameDeployed:
                   title: Model Name
@@ -373,10 +373,10 @@ spec:
           dockerfile: Containerfile
           buildContext: .
           gitopsSecretName: ${{ 'gitops-auth-secret' if parameters.hostType === 'GitHub' else 'gitlab-auth-secret' }}
-          image: '${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          image: "${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           tags: '["ai", "llamacpp", "vllm", "python", "rag", "database"]'
           owner: ${{ parameters.owner }}
-          repoSlug: '${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          repoSlug: "${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           defaultBranch: ${{ parameters.branch }}
     - id: fetch-github-action
       name: Fetch GitHub Action
@@ -392,7 +392,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.githubServer}}']
+        allowedHosts: ["${{ parameters.githubServer}}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -409,7 +409,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -428,11 +428,11 @@ spec:
           appName: ${{ parameters.name }}-gitops # for now just use the component name, since it's single component app
           description: This is GitOps manifest for ${{ parameters.name }}
           namespace: ${{ parameters.remoteClusterDeploymentNamespace if parameters.deployArgoCDApplicationOnRemoteCluster else parameters.namespace }}
-          rhdhNamespace: ai-rhdh
+          rhdhNamespace: rolling-demo-ns
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
-          argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          argoComponentOverlays: "./components/${{ parameters.name }}/overlays"
           owner: ${{ parameters.owner }}
           argoNS: ${{ parameters.argoNS }}
           argoProject: ${{ parameters.argoProject }}
@@ -493,40 +493,40 @@ spec:
       if: false
       input:
         files:
-          - 'gitops/components/http/base/deployment-database.yaml'
-          - 'gitops/components/http/base/service-database.yaml'
-          - 'gitops/components/http/base/database-config.yaml'
+          - "gitops/components/http/base/deployment-database.yaml"
+          - "gitops/components/http/base/service-database.yaml"
+          - "gitops/components/http/base/database-config.yaml"
     - id: cleanupRhoaiResources
       action: fs:delete
       name: Cleanup Unused RHOAI Resources
       if: ${{ not parameters.rhoaiSelected }}
       input:
         files:
-          - 'gitops/components/http/base/rhoai'
+          - "gitops/components/http/base/rhoai"
     - id: cleanupvLLMResources
       action: fs:delete
       name: Cleanup Unused vLLM Resources
       if: ${{ parameters.modelServer !== 'vLLM' }}
       input:
         files:
-          - 'gitops/components/http/base/pvc.yaml'
+          - "gitops/components/http/base/pvc.yaml"
     - id: cleanupModelServerResources
       action: fs:delete
       name: Cleanup Unused Model Server Resources
       if: ${{ true if parameters.modelServer === 'Bring you own model server' else (true if parameters.modelServer === 'choose-from-the-catalog' else false) }}
       input:
         files:
-          - 'gitops/components/http/base/deployment-model-server.yaml'
-          - 'gitops/components/http/base/service-model-server.yaml'
+          - "gitops/components/http/base/deployment-model-server.yaml"
+          - "gitops/components/http/base/service-model-server.yaml"
     - id: cleanupApplicationResources
       action: fs:delete
       name: Cleanup Unused Application Resources
       if: false
       input:
         files:
-          - 'gitops/components/http/base/deployment.yaml'
-          - 'gitops/components/http/base/service.yaml'
-          - 'gitops/components/http/base/route.yaml'
+          - "gitops/components/http/base/deployment.yaml"
+          - "gitops/components/http/base/service.yaml"
+          - "gitops/components/http/base/route.yaml"
     - action: fs:rename
       id: renameComponentDir
       name: Rename Component Directory
@@ -541,7 +541,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.githubServer }}']
+        allowedHosts: ["${{ parameters.githubServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -554,7 +554,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -562,7 +562,7 @@ spec:
         repoVisibility: "public"
     - id: wait-for-github-repository
       name: Waiting for Repository Availability
-      action: 'debug:wait'
+      action: "debug:wait"
       input:
         seconds: 3
     # SED_APP_SUPPORT_START
@@ -571,14 +571,14 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl if steps['publish-github'].output else steps['publish-gitlab'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     # SED_APP_SUPPORT_END
     - id: register-gitops
       name: Register Gitops
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github-gitops'].output.repoContentsUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     - id: create-argocd-resources
       name: Create ArgoCD Resources
       action: argocd:create-resources
@@ -589,7 +589,7 @@ spec:
         namespace: ${{ parameters.argoNS }}
         labelValue: ${{ parameters.argoAppLabel if parameters.includeArgoLabel else '' }}
         repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
-        path: './app-of-apps'
+        path: "./app-of-apps"
     # SED_APP_SUPPORT_START
     # PR with empty commit
     - id: trigger-build-pr
@@ -613,7 +613,8 @@ spec:
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         branchOrTagName: ${{ parameters.branch }}
         workflowId: automerge.yml
-        workflowInputs: {pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}"}
+        workflowInputs:
+          { pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}" }
   # SED_APP_SUPPORT_END
 
   # Outputs are displayed to the user after a successful execution of the template.
