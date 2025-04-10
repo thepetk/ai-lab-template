@@ -543,7 +543,7 @@ spec:
         # name set in rhdh config
         argoInstance: ${{ parameters.argoInstance }}
         namespace: ${{ parameters.argoNS }}
-        labelValue: ${{ parameters.argoAppLabel if parameters.includeArgoLabel else '' }}
+        labelValue: rolling-demo
         repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
         path: "./app-of-apps"
     # SED_APP_SUPPORT_START
