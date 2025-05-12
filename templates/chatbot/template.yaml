@@ -32,19 +32,17 @@ spec:
           title: Owner
           type: string
           description: Owner of the component
-          default: user:guest
+          default: user:default/evanshortiss
           ui:field: OwnerPicker
           ui:options:
-            catalogFilter:
-              kind: [Group, User]
-              readonly: false
+            allowArbitraryValues: false
         modelServer:
           # SED_LLM_SERVER_START
           title: Model Server
           description: |
-            llama.cpp: A Python binding of LLM inference in C/C++ with minimal setup. | [Learn more](https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/llamacpp_python/0.3.8)
+            llama.cpp: A Python binding of LLM inference in C/C++ with minimal setup. | [Learn more](https://github.com/containers/ai-lab-recipes/tree/main/model_servers/llamacpp_python)
 
-            vLLM: A high throughput, memory efficient inference and serving engine with GPU support for LLMs in OpenShift. If you choose vLLM, ensure that your cluster has Nvidia GPU supported (with compute capability 7.0 or higher). Also, it should have enough CPU & memory resources for the model you would like to work with. | [Learn more](https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/vllm/0.8.4)
+            vLLM: A high throughput, memory efficient inference and serving engine with GPU support for LLMs in OpenShift. If you choose vLLM, ensure that your cluster has Nvidia GPU supported (with compute capability 7.0 or higher). Also, it should have enough CPU & memory resources for the model you would like to work with. | [Learn more](https://github.com/rh-aiservices-bu/llm-on-openshift/tree/main/llm-servers/vllm/gpu)
           # SED_LLM_LLAMA_SERVER_START
           default: llama.cpp
           # SED_LLM_LLAMA_SERVER_END
@@ -54,7 +52,7 @@ spec:
             # SED_LLM_LLAMA_SERVER_START
             - llama.cpp
             # SED_LLM_LLAMA_SERVER_END
-          # SED_LLM_SERVER_END
+            # SED_LLM_SERVER_END
             # SED_EXISTING_SERVER_START
             - Existing model server
             # SED_EXISTING_SERVER_END
@@ -63,22 +61,23 @@ spec:
           oneOf:
             # SED_EXISTING_SERVER_START
             - required:
-                - modelEndpoint
                 # SED_LLM_SERVER_START
                 - modelName
                 # SED_LLM_SERVER_END
               properties:
                 modelServer:
                   const: Existing model server
-                modelEndpoint:
-                  title: Model Server Endpoint
-                  type: string
-                  description: "The endpoint for an existing model server."
                 # SED_LLM_SERVER_START
                 modelName:
                   title: Model Name
                   type: string
-                  ui:help: "The name of the model deployed on the model server you would like to use."
+                  description: Model
+                  ui:field: EntityPicker
+                  ui:options:
+                    allowArbitraryValues: false
+                    catalogFilter:
+                      - kind: Component
+                        spec.type: "model-server"
                 # SED_LLM_SERVER_END
                 includeModelEndpointSecret:
                   title: Is bearer authentication required?
@@ -112,22 +111,22 @@ spec:
                   const: vLLM
                 modelNameDeployed:
                   title: Model Name
-                  description: Text Generation | Apache-2.0 | [Learn more](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct)
-                  default: ibm-granite/granite-3.1-8b-instruct
+                  description: Text Generation | Apache-2.0 | [Learn more](https://huggingface.co/instructlab/granite-7b-lab)
+                  default: instructlab/granite-7b-lab
                   type: string
                   enum:
-                    - ibm-granite/granite-3.1-8b-instruct
+                    - instructlab/granite-7b-lab
             # SED_LLM_LLAMA_SERVER_START
             - properties:
                 modelServer:
                   const: llama.cpp
                 modelNameDeployed:
                   title: Model Name
-                  description: Text Generation | Apache-2.0 | [Learn more](https://huggingface.co/ibm-granite/granite-3.1-8b-instruct)
-                  default: ibm-granite/granite-3.1-8b-instruct
+                  description: Text Generation | Apache-2.0 | [Learn more](https://huggingface.co/instructlab/granite-7b-lab)
+                  default: instructlab/granite-7b-lab
                   type: string
                   enum:
-                    - ibm-granite/granite-3.1-8b-instruct
+                    - instructlab/granite-7b-lab
             # SED_LLM_LLAMA_SERVER_END
             # SED_LLM_SERVER_END
     - title: Application Repository Information
@@ -146,6 +145,7 @@ spec:
           default: GitHub
         repoOwner:
           title: Repository Owner
+          default: ai-rolling-demo
           type: string
           ui:help: The organization, user or project that this repo will belong to
         repoName:
@@ -196,6 +196,7 @@ spec:
           ui:help: "You can also provide the on-prem registry host, example: quay-tv2pb.apps.cluster-tv2pb.sandbox1194.opentlc.com"
         imageOrg:
           title: Image Organization
+          default: rhdhpai-rolling-demo
           type: string
           description: The organization, user or project that this repo will belong to
         imageName:
@@ -223,6 +224,11 @@ spec:
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
   steps:
+    - id: fetchModelComponentUrl
+      name: Fetch Model URL
+      action: catalog:fetch
+      input:
+        entityRef: ${{ parameters.modelName }}
     # SED_APP_SUPPORT_START
     # Each step executes an action, in this case one templates files into the workspace.
     # Get the sample source code
@@ -248,15 +254,8 @@ spec:
           appContainer: ${{ 'quay.io/redhat-ai-dev/ai-template-bootstrap-app:latest' if parameters.hostType === 'GitHub' else 'quay.io/redhat-ai-dev/chatbot:latest' }}
           appPort: 8501
           appRunCommand: "streamlit run chatbot_ui.py"
-          modelServiceContainer: quay.io/redhat-ai-dev/llamacpp_python:0.3.8
+          modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
           modelServicePort: 8001
-          customModelName: ${{ parameters.modelName }}
-          modelName: ibm-granite/granite-3.1-8b-instruct
-          modelSrc: https://huggingface.co/ibm-granite/granite-3.1-8b-instruct
-          modelServerName: ${{ parameters.modelServer }}
-          customModelAndModelServerSelected: ${{ true if parameters.modelServer === 'Existing model server' else false }}
-          modelServiceSrcVLLM: https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/vllm/0.8.4
-          modelServiceSrcOther: https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/llamacpp_python/0.3.8
     # Renders all the template variables into the files and directory names and content, and places the result in the workspace.
     - id: fetch-skeleton
       name: Fetch Skeleton
@@ -271,10 +270,10 @@ spec:
           dockerfile: Containerfile
           buildContext: .
           gitopsSecretName: ${{ 'gitops-auth-secret' if parameters.hostType === 'GitHub' else 'gitlab-auth-secret' }}
-          image: '${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          image: "${{ parameters.imageRegistry }}/${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           tags: '["ai", "llamacpp", "vllm", "python"]'
           owner: ${{ parameters.owner }}
-          repoSlug: '${{ parameters.imageOrg }}/${{ parameters.imageName }}'
+          repoSlug: "${{ parameters.imageOrg }}/${{ parameters.imageName }}"
           defaultBranch: ${{ parameters.branch }}
     - id: fetch-github-action
       name: Fetch GitHub Action
@@ -290,7 +289,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.githubServer}}']
+        allowedHosts: ["${{ parameters.githubServer}}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -307,7 +306,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: source
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         defaultBranch: ${{ parameters.branch }}
@@ -326,13 +325,13 @@ spec:
           appName: ${{ parameters.name }}-gitops # for now just use the component name, since it's single component app
           description: This is GitOps manifest for ${{ parameters.name }}
           namespace: ${{ parameters.namespace }}
-          rhdhNamespace: ai-rhdh
+          rhdhNamespace: rolling-demo-ns
           # example: github.com?owner=<owner>&repo=<srcRepo>, the gitops repo name will be <srcRepo>-gitops
           repoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops
           srcRepoURL: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}
-          argoComponentOverlays: './components/${{ parameters.name }}/overlays'
+          argoComponentOverlays: "./components/${{ parameters.name }}/overlays"
           owner: ${{ parameters.owner }}
-          argoNS: ai-rhdh
+          argoNS: openshift-gitops
           argoProject: default
           secretRef: ${{ parameters.hostType === 'GitLab' }}
           gitSecret: gitlab-auth-secret
@@ -340,23 +339,23 @@ spec:
           webhookSecret: pipelines-secret
           webhookSecretKey: webhook.secret
           defaultBranch: main
-          initContainer: quay.io/redhat-ai-dev/granite-3.1-8b-instruct-gguf:latest
+          initContainer: quay.io/redhat-ai-dev/granite-7b-lab:latest
           modelInitCommand: "['/usr/bin/install', '/model/model.file', '/shared/']"
           modelPath: "/model/model.file"
           appContainer: ${{ 'quay.io/redhat-ai-dev/ai-template-bootstrap-app:latest' if parameters.hostType === 'GitHub' else 'quay.io/redhat-ai-dev/chatbot:latest' }}
           appPort: 8501
-          modelServiceContainer: quay.io/redhat-ai-dev/llamacpp_python:0.3.8
+          modelServiceContainer: quay.io/ai-lab/llamacpp_python:latest
           modelServicePort: 8001
           # SED_LLM_SERVER_START
           # for vllm
           vllmSelected: ${{ parameters.modelServer === 'vLLM' }}
-          vllmModelServiceContainer: quay.io/redhat-ai-dev/vllm-openai-ubi9:v0.8.4
-          modelName: ${{ parameters.modelName if parameters.modelServer === 'Existing model server' else 'ibm-granite/granite-3.1-8b-instruct' }}
+          vllmModelServiceContainer: quay.io/rh-aiservices-bu/vllm-openai-ubi9:0.4.2
+          modelName: ${{ parameters.modelName | parseEntityRef | pick('name') if parameters.modelServer === 'Existing model server' else 'instructlab/granite-7b-lab' }}
           maxModelLength: 4096
           # SED_LLM_SERVER_END
           existingModelServer: ${{ parameters.modelServer === 'Existing model server' }}
           # SED_EXISTING_SERVER_START
-          modelEndpoint: ${{ parameters.modelEndpoint }}
+          modelEndpoint: ${{ steps['fetchModelComponentUrl'].output.entity.metadata.links[0].url }}
           modelEndpointSecretName: ${{ parameters.modelEndpointSecretName }}
           modelEndpointSecretKey: ${{ parameters.modelEndpointSecretKey }}
           includeModelEndpointSecret: ${{ parameters.includeModelEndpointSecret }}
@@ -366,12 +365,6 @@ spec:
           rhoaiSelected: ${{ parameters.rhoaiSelected }}
           # SED_APP_SUPPORT_END
           supportApp: true
-          modelServerName: ${{ parameters.modelServer }}
-          modelServiceSrcVLLM: https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/vllm/0.8.4
-          modelServiceSrcOther: https://github.com/redhat-ai-dev/developer-images/tree/main/model-servers/llamacpp_python/0.3.8
-          imageRegistry: ${{ parameters.imageRegistry }}
-          imageOrg: ${{ parameters.imageOrg }}
-          imageName: ${{ parameters.imageName }}
     - action: fs:rename
       id: renameComponentDir
       name: Rename Component Directory
@@ -386,7 +379,7 @@ spec:
       if: ${{ parameters.hostType === 'GitHub' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.githubServer }}']
+        allowedHosts: ["${{ parameters.githubServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -399,7 +392,7 @@ spec:
       if: ${{ parameters.hostType === 'GitLab' }}
       input:
         sourcePath: gitops
-        allowedHosts: ['${{ parameters.gitlabServer }}']
+        allowedHosts: ["${{ parameters.gitlabServer }}"]
         description: This is GitOps repository for ${{ parameters.name }}
         repoUrl: ${{ parameters.gitlabServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: "main"
@@ -407,7 +400,7 @@ spec:
         repoVisibility: "public"
     - id: wait-for-github-repository
       name: Waiting for Repository Availability
-      action: 'debug:wait'
+      action: "debug:wait"
       input:
         seconds: 3
     # SED_APP_SUPPORT_START
@@ -416,14 +409,14 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl if steps['publish-github'].output else steps['publish-gitlab'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     # SED_APP_SUPPORT_END
     - id: register-gitops
       name: Register Gitops
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish-github-gitops'].output.repoContentsUrl if steps['publish-github-gitops'].output else steps['publish-gitlab-gitops'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoPath: "/catalog-info.yaml"
     - id: create-argocd-resources
       name: Create ArgoCD Resources
       action: argocd:create-resources
@@ -431,9 +424,10 @@ spec:
         appName: ${{ parameters.name }}-app-of-apps
         # name set in rhdh config
         argoInstance: default
-        namespace: ai-rhdh
+        labelValue: rolling-demo
+        namespace: openshift-gitops
         repoUrl: https://${{ parameters.githubServer if parameters.hostType === 'GitHub' else parameters.gitlabServer }}/${{ parameters.repoOwner }}/${{ parameters.repoName }}-gitops.git
-        path: './app-of-apps'
+        path: "./app-of-apps"
     # SED_APP_SUPPORT_START
     # PR with empty commit
     - id: trigger-build-pr
@@ -457,7 +451,8 @@ spec:
         repoUrl: ${{ parameters.githubServer }}?owner=${{ parameters.repoOwner }}&repo=${{ parameters.repoName }}
         branchOrTagName: ${{ parameters.branch }}
         workflowId: automerge.yml
-        workflowInputs: {pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}"}
+        workflowInputs:
+          { pr_url: "${{ steps['trigger-build-pr'].output.remoteUrl }}" }
   # SED_APP_SUPPORT_END
 
   # Outputs are displayed to the user after a successful execution of the template.
